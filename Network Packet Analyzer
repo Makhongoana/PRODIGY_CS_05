@@ -1,0 +1,32 @@
+import socket
+
+def sniff_packets():
+    # Create a raw socket
+    s = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3))
+
+    while True:
+        # Receive a packet
+        packet = s.recvfrom(2048)
+
+        # Extract packet data
+        packet_data = packet[0]
+
+        # Extract Ethernet header (first 14 bytes)
+        eth_header = packet_data[:14]
+
+        # Parse the source and destination MAC addresses
+        src_mac = "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x" % tuple(eth_header[i] for i in range(6))
+        dst_mac = "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x" % tuple(eth_header[i] for i in range(6, 12))
+
+        # Print MAC addresses
+        print("Source MAC:", src_mac)
+        print("Destination MAC:", dst_mac)
+
+        # Extract the payload (rest of the packet)
+        payload = packet_data[14:]
+
+        # Print the payload
+        print("Payload:", payload.hex())
+
+if __name__ == "__main__":
+    sniff_packets()
